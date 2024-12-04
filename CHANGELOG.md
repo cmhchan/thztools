@@ -166,7 +166,7 @@ for maintaining this file.
   `noise_amp`, `noise_sim`, and `noise_var`, respectively
 - Revise `noisefit` and associated functions to treat each of the 3 noise
   parameters separately instead of as a 3-component array, so that each may
-  fixed independently in the optimization process
+  be fixed independently in the optimization process
 - Adjust internal scaling in `noisefit`
 - Reorganize `NoiseResult` class as output for `noisefit`
 - Revise `NoiseResult` docstring
