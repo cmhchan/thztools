@@ -78,10 +78,10 @@ class TestOptions:
         elif global_sampling_time is None and dt is not None:
             assert np.isclose(_assign_sampling_time(dt), dt)
         elif (
-            global_sampling_time is not None
-            and dt is None
-            or global_sampling_time is not None
-            and np.isclose(dt, global_sampling_time)
+            (global_sampling_time is not None
+            and dt is None)
+            or (global_sampling_time is not None
+            and np.isclose(dt, global_sampling_time))
         ):
             assert np.isclose(_assign_sampling_time(dt), global_sampling_time)
         else:
