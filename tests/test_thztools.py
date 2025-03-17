@@ -275,6 +275,8 @@ class TestWave:
         )
 
 
+
+
 class TestScaleShift:
     n = 16
     dt = 1.0 / n
