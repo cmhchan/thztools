@@ -86,10 +86,15 @@ make-logo = ["python logo/make_logo.py; mv thztools_logo.svg docs/source/_static
 python = ["3.9", "3.10", "3.11", "3.12", "3.13", ]
 
 [tool.ruff]
-target-version = "py39"
 line-length = 79
 exclude = ["examples/figgen/**"]
 
+[tool.ruff.lint]
+extend-select = [
+    "B",  # flake8-bugbear
+    "I",  # isort
+    "UP",  # pyupgrade
+]
 [tool.ruff.lint.per-file-ignores]
 "docs/source/**" = ["INP001"]
 "tests/**" = ["INP001"]
@@ -143,6 +148,9 @@ build = "sphinx-build -v -b html docs/source docs/build/html"
 
 [tool.mypy]
 plugins = "numpy.typing.mypy_plugin"
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
 module = [
