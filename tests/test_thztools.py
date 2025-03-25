@@ -45,26 +45,22 @@ def jac_tfun(
     return np.stack((np.exp(1j * p1 * w), 1j * w * p0 * np.exp(1j * p1 * w))).T
 
 
+def data_gen(
+    n: int = n_default, *, np_sign: bool = True
+) -> dict[str, Any]:
+    dt = 1.0 / n
+    t = np.arange(n) * dt
+    f = np.fft.rfftfreq(n, dt)
+    x = np.sin(4 * pi * t)
+    p0 = (0.5, dt)
+    y = apply_frf(tfun, x, dt=dt, args=p0, numpy_sign_convention=np_sign)
+    return {"dt": dt, "t": t, "f": f, "x": x, "p0": p0, "y": y}
+
+
 # Reset options before each test
 @pytest.fixture(autouse=True)
 def global_reset() -> None:
     reset_option()
-
-
-@pytest.fixture(scope="class")
-def data_gen() -> dict[str, Any]:
-    def _data_gen(
-        n: int = n_default, *, np_sign: bool = True
-    ) -> dict[str, Any]:
-        dt = 1.0 / n
-        t = np.arange(n) * dt
-        f = np.fft.rfftfreq(n, dt)
-        x = np.sin(4 * pi * t)
-        p0 = (0.5, dt)
-        y = apply_frf(tfun, x, dt=dt, args=p0, numpy_sign_convention=np_sign)
-        return {"dt": dt, "t": t, "f": f, "x": x, "p0": p0, "y": y}
-
-    return _data_gen
 
 
 class TestOptions:
@@ -191,7 +187,7 @@ class TestNoiseModel:
 class TestTransferOut:
     @pytest.mark.parametrize("fft_sign", [True, False])
     def test_inputs(
-        self, fft_sign, data_gen: Callable[[bool], dict[str, Any]]
+        self, fft_sign
     ):
         d = data_gen()
         dt = d["dt"]
@@ -207,7 +203,7 @@ class TestTransferOut:
         )
 
     @pytest.mark.parametrize("x", [np.ones((n_default, n_default))])
-    def test_error(self, x: NDArray[np.float64], data_gen: Callable):
+    def test_error(self, x: NDArray[np.float64]):
         d = data_gen()
         dt = d["dt"]
         with pytest.raises(
@@ -1186,7 +1182,6 @@ class TestFit:
         p_bounds: ArrayLike | None,
         jac: Callable[[ArrayLike, float, float], NDArray[np.complex128]],
         lsq_options: dict[str, Any],
-        data_gen: Callable[[int, bool], dict[str, Any]],
     ) -> None:
         d = data_gen(n, np_sign=numpy_sign_convention)
         dt = d["dt"]
@@ -1228,7 +1223,6 @@ class TestFit:
     @pytest.mark.parametrize("jac", [None, jac_tfun])
     def test_args(
         self,
-        data_gen: Callable[[bool], dict[str, Any]],
         *,
         numpy_sign_convention: bool,
         jac: Callable[[ArrayLike, float, float], NDArray[np.complex128]]
@@ -1257,7 +1251,6 @@ class TestFit:
     @pytest.mark.parametrize("jac", [None, jac_tfun])
     def test_kwargs(
         self,
-        data_gen: Callable[[bool], dict[str, Any]],
         *,
         numpy_sign_convention: bool,
         jac: Callable[[ArrayLike, float, float], NDArray[np.complex128]],
@@ -1281,7 +1274,7 @@ class TestFit:
         )
         assert_allclose(p.p_opt, p0[0])
 
-    def test_errors(self, data_gen: Callable[[], dict[str, Any]]) -> None:
+    def test_errors(self) -> None:
         d = data_gen()
         p0 = d["p0"]
         x = d["x"]
