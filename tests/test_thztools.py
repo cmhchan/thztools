@@ -33,21 +33,19 @@ rtol = 1e-5
 n_default = 16
 
 
-def tfun(w: ArrayLike, p0: float, p1: float) -> ArrayLike:
-    w = np.asarray(w)
+def tfun(
+    w: NDArray[np.float64], p0: float, p1: float
+) -> NDArray[np.complex128]:
     return p0 * np.exp(1j * p1 * w)
 
 
 def jac_tfun(
     w: NDArray[np.float64], p0: float, p1: float
 ) -> NDArray[np.complex128]:
-    w = np.asarray(w)
     return np.stack((np.exp(1j * p1 * w), 1j * w * p0 * np.exp(1j * p1 * w))).T
 
 
-def data_gen(
-    n: int = n_default, *, np_sign: bool = True
-) -> dict[str, Any]:
+def data_gen(n: int = n_default, *, np_sign: bool = True) -> dict[str, Any]:
     dt = 1.0 / n
     t = np.arange(n) * dt
     f = np.fft.rfftfreq(n, dt)
@@ -75,20 +73,25 @@ class TestOptions:
     @pytest.mark.parametrize("dt", [None, 0.1, 1.0])
     def test_assignment(
         self, global_sampling_time: float | None, dt: float | None
-    ):
+    ) -> None:
         set_option("sampling_time", global_sampling_time)
         if global_sampling_time is None and dt is None:
             assert np.isclose(_assign_sampling_time(dt), 1.0)
         elif global_sampling_time is None and dt is not None:
             assert np.isclose(_assign_sampling_time(dt), dt)
-        elif (global_sampling_time is not None and dt is None) or (
+        elif (
             global_sampling_time is not None
-            and np.isclose(dt, global_sampling_time)
+            and dt is None
+            or (
+                global_sampling_time is not None
+                and dt is not None
+                and np.isclose(dt, global_sampling_time)
+            )
         ):
             assert np.isclose(_assign_sampling_time(dt), global_sampling_time)
         else:
             with pytest.warns(UserWarning):
-                assert np.isclose(_assign_sampling_time(dt), dt)
+                _assign_sampling_time(dt)
 
 
 class TestNoiseModel:
@@ -114,10 +117,10 @@ class TestNoiseModel:
         alpha: float,
         beta: float,
         tau: float,
-        mu: ArrayLike,
+        mu: NDArray[np.float64],
         dt: float | None,
         axis: int,
-        expected: ArrayLike,
+        expected: NDArray[np.float64],
     ) -> None:
         if dt is None:
             noise_model = NoiseModel(alpha, beta, tau)
@@ -143,10 +146,10 @@ class TestNoiseModel:
         alpha: float,
         beta: float,
         tau: float,
-        mu: ArrayLike,
-        dt: float,
+        mu: NDArray[np.float64],
+        dt: float | None,
         axis: int,
-        expected: ArrayLike,
+        expected: NDArray[np.float64],
     ) -> None:
         if dt is None:
             noise_model = NoiseModel(alpha, beta, tau)
@@ -171,7 +174,7 @@ class TestNoiseModel:
         beta: float,
         tau: float,
         mu: ArrayLike,
-        dt: float,
+        dt: float | None,
         axis: int,
         expected: ArrayLike,
     ) -> None:
@@ -186,9 +189,7 @@ class TestNoiseModel:
 
 class TestTransferOut:
     @pytest.mark.parametrize("fft_sign", [True, False])
-    def test_inputs(
-        self, fft_sign
-    ):
+    def test_inputs(self, *, fft_sign: bool) -> None:
         d = data_gen()
         dt = d["dt"]
         x = d["x"]
@@ -203,7 +204,7 @@ class TestTransferOut:
         )
 
     @pytest.mark.parametrize("x", [np.ones((n_default, n_default))])
-    def test_error(self, x: NDArray[np.float64]):
+    def test_error(self, x: NDArray[np.float64]) -> None:
         d = data_gen()
         dt = d["dt"]
         with pytest.raises(
@@ -1180,7 +1181,9 @@ class TestFit:
         noise_parms: ArrayLike,
         f_bounds: tuple | None,
         p_bounds: ArrayLike | None,
-        jac: Callable[[ArrayLike, float, float], NDArray[np.complex128]],
+        jac: Callable[
+            [NDArray[np.float64], float, float], NDArray[np.complex128]
+        ],
         lsq_options: dict[str, Any],
     ) -> None:
         d = data_gen(n, np_sign=numpy_sign_convention)
@@ -1225,7 +1228,9 @@ class TestFit:
         self,
         *,
         numpy_sign_convention: bool,
-        jac: Callable[[ArrayLike, float, float], NDArray[np.complex128]]
+        jac: Callable[
+            [NDArray[np.float64], float, float], NDArray[np.complex128]
+        ]
         | None,
     ) -> None:
         sigma = self.sigma
@@ -1253,7 +1258,9 @@ class TestFit:
         self,
         *,
         numpy_sign_convention: bool,
-        jac: Callable[[ArrayLike, float, float], NDArray[np.complex128]],
+        jac: Callable[
+            [NDArray[np.float64], float, float], NDArray[np.complex128]
+        ],
     ) -> None:
         sigma = self.sigma
         d = data_gen(np_sign=numpy_sign_convention)

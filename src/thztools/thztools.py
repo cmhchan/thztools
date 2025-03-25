@@ -2930,7 +2930,7 @@ def fit(
     ----------
     frfun : callable
         Frequency response function with signature ``frfun(omega, *p, *args,
-        **kwargs)`` that returns an ``ndarray``. Assumes the
+        **kwargs)`` that returns a complex ``ndarray``. Assumes the
         :math:`+i\omega t` convention for harmonic time dependence when
         ``numpy_sign_convention`` is ``True``, the default. All elements of
         ``p`` and ``args`` and all values of ``kwargs`` must be real
