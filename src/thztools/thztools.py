@@ -1097,7 +1097,7 @@ def scaleshift(
     if x.ndim > 1 and axis != -1:
         x_adjusted = np.moveaxis(x_adjusted, -1, axis)
 
-    return x_adjusted
+    return np.astype(x_adjusted, np.float64)
 
 
 @dataclass
@@ -1207,7 +1207,7 @@ def _nll_noisefit(
     scale_delta_mu: NDArray[np.float64],
     scale_delta_a: NDArray[np.float64],
     scale_eta_on_dt: NDArray[np.float64],
-) -> tuple[float, NDArray[np.float64]]:
+) -> np.float64:
     r"""
     Compute the cost function for the time-domain noise model.
 
@@ -1268,7 +1268,7 @@ def _nll_noisefit(
     vtot = common.vtot
     resnormsq_scaled = ressq / vtot
 
-    return 0.5 * (np.sum(np.log(vtot)) + np.sum(resnormsq_scaled))
+    return np.float64(0.5 * (np.sum(np.log(vtot)) + np.sum(resnormsq_scaled)))
 
 
 def _jac_noisefit(
@@ -1973,7 +1973,7 @@ def _hess_noisefit(
     scale = np.concatenate(scale_block[~fix].tolist())
 
     # Return Hessian in scaled internal variables
-    return np.diag(scale) @ h @ np.diag(scale)
+    return np.astype(np.diag(scale) @ h @ np.diag(scale), np.float64)
 
 
 def noisefit(
@@ -1998,7 +1998,7 @@ def noisefit(
     scale_delta_mu: ArrayLike | None = None,
     scale_delta_a: ArrayLike | None = None,
     scale_eta: ArrayLike | None = None,
-    min_options: dict | None = None,
+    min_options: dict[str, Any] | None = None,
 ) -> NoiseResult:
     r"""
     Estimate noise model from a set of nominally identical waveforms.
@@ -2249,7 +2249,12 @@ def _parse_noisefit_input(
     scale_delta_mu: ArrayLike | None,
     scale_delta_a: ArrayLike | None,
     scale_eta: ArrayLike | None,
-) -> tuple[Callable, Callable, NDArray[np.float64], dict]:
+) -> tuple[
+    Callable[[NDArray[np.float64]], np.float64],
+    Callable[[NDArray[np.float64]], NDArray[np.float64]],
+    NDArray[np.float64],
+    dict[str, Any],
+]:
     """Parse noisefit inputs"""
     if x.ndim != NUM_NOISE_DATA_DIMENSIONS:
         msg = "Data array x must be 2D"
@@ -2313,6 +2318,8 @@ def _parse_noisefit_input(
         scale_delta_mu[np.isclose(scale_delta_mu, 0.0)] = np.sqrt(
             np.finfo(float).eps
         )
+
+    scale_delta_mu = np.asarray(scale_delta_mu, dtype=np.float64)
 
     if scale_delta_a is None:
         scale_delta_a_amp = np.max((sigma_min, sigma_beta0))
@@ -2385,7 +2392,9 @@ def _parse_noisefit_input(
         x0 = np.concatenate((x0, eta_scaled0))
 
     # Bundle free parameters together into objective function
-    def objective(_p):
+    def objective(
+        _p: NDArray[np.float64],
+    ) -> np.float64:
         if fix_sigma_alpha:
             _logv_alpha = logv0_scaled[0]
         else:
@@ -2431,7 +2440,7 @@ def _parse_noisefit_input(
         )
 
     # Bundle free parameters together into objective function
-    def jac(_p):
+    def jac(_p: NDArray[np.float64]) -> NDArray[np.float64]:
         if fix_sigma_alpha:
             _logv_alpha = logv0_scaled[0]
         else:
@@ -2482,7 +2491,7 @@ def _parse_noisefit_input(
             scale_eta_on_dt=scale_eta / dt,  # Scale in units of dt
         )
 
-    def hess(_p):
+    def hess(_p: NDArray[np.float64]) -> NDArray[np.float64]:
         if fix_sigma_alpha:
             _logv_alpha = logv0_scaled[0]
         else:
