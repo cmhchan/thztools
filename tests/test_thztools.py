@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Concatenate
+import sys
+from typing import TYPE_CHECKING, Any, Callable
 
 import numpy as np
 import pytest
@@ -9,6 +10,14 @@ from numpy.testing import assert_allclose
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
+
+if sys.version_info >= (3, 10):
+    from typing import Concatenate
+elif sys.version_info[:2] == (3, 9):
+    from typing_extensions import Concatenate
+else:
+    msg = "Concatenate type annotation unavailable for Python 3.8 and earlier."
+    raise ValueError(msg)
 
 import thztools
 from thztools.thztools import (

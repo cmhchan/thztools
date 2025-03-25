@@ -49,9 +49,10 @@ Create an ideal waveform and apply a frequency response function to it.
 
 from __future__ import annotations
 
+import sys
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Concatenate
+from typing import TYPE_CHECKING, Any, Callable
 
 import numpy as np
 import scipy.linalg as la
@@ -62,6 +63,15 @@ from numpy.random import default_rng
 from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
+
+print(sys.version_info)
+if sys.version_info >= (3, 10):
+    from typing import Concatenate
+elif sys.version_info[:2] == (3, 9):
+    from typing_extensions import Concatenate
+else:
+    msg = "Concatenate type annotation unavailable for Python 3.8 and earlier."
+    raise ValueError(msg)
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray

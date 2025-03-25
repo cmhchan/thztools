@@ -147,6 +147,11 @@ dependencies = [
 [tool.hatch.envs.docs.scripts]
 build = "sphinx-build -v -b html docs/source docs/build/html"
 
+[tool.hatch.envs.all]
+dependencies = [
+    "typing-extensions",
+]
+
 [tool.mypy]
 plugins = "numpy.typing.mypy_plugin"
 strict = true
