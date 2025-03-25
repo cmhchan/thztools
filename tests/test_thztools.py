@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, reveal_type
+from typing import TYPE_CHECKING, Any, Callable, Concatenate
 
 import numpy as np
 import pytest
@@ -1204,9 +1204,7 @@ class TestFit:
             f_list = list(f_bounds)
             for i in range(2):
                 f_list[i] = (
-                    f[f_list[i]]
-                    if isinstance(f_list[i], int)
-                    else f_list[i]
+                    f[f_list[i]] if isinstance(f_list[i], int) else f_list[i]
                 )
             f_bounds = tuple(f_list)
 

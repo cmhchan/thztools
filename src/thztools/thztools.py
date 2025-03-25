@@ -665,7 +665,9 @@ class NoiseResult:
 
 # noinspection PyShadowingNames
 def apply_frf(
-    frfun: Callable,
+    frfun: Callable[
+        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
+    ],
     x: ArrayLike,
     *,
     dt: float | None = None,
@@ -2834,7 +2836,9 @@ class FitResult:
 
 
 def _costfuntls(
-    frfun: Callable,
+    frfun: Callable[
+        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
+    ],
     theta: ArrayLike,
     mu: ArrayLike,
     x: ArrayLike,
@@ -3133,7 +3137,7 @@ def fit(
     """
     fit_method = "trf"
 
-    args = np.atleast_1d(args)
+    args = np.atleast_1d(np.asarray(args))
     if kwargs is None:
         kwargs = {}
 
@@ -3258,7 +3262,7 @@ def fit(
         return _a + _b * 1j
 
     def function(
-        _w: NDArray[np.float64], *_theta: np.float64
+        _w: NDArray[np.float64], /, *_theta: np.float64
     ) -> NDArray[np.complex128]:
         _a = np.asarray(_theta[n_p : n_p + n_a], dtype=np.float64)
         _b = np.asarray(_theta[n_p + n_a :], dtype=np.float64)
@@ -3275,12 +3279,15 @@ def fit(
             # If Jacobian is not supplied, compute it numerically
             _tf_prime = approx_fprime(_p, function_flat)
             _tf_prime_complex = _tf_prime[0:n_in] + 1j * _tf_prime[n_in:]
-            out = np.atleast_2d(_tf_prime_complex).T
+            out = np.astype(np.atleast_2d(_tf_prime_complex).T, np.complex128)
         else:
             # Otherwise, return supplied Jacobian
-            out = np.atleast_2d(jac(w[f_incl_idx], *_p, *args, **kwargs))[
-                :, :n_p
-            ].T
+            out = np.astype(
+                np.atleast_2d(jac(w[f_incl_idx], *_p, *args, **kwargs))[
+                    :, :n_p
+                ].T,
+                np.complex128,
+            )
         if not numpy_sign_convention:
             return np.conj(out)
         return out
