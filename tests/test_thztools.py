@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Concatenate
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, reveal_type
 
 import numpy as np
 import pytest
@@ -1182,7 +1182,7 @@ class TestFit:
         *,
         numpy_sign_convention: bool,
         noise_parms: ArrayLike,
-        f_bounds: tuple | None,
+        f_bounds: tuple[Any, Any] | None,
         p_bounds: ArrayLike | None,
         jac: Callable[
             Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
@@ -1201,14 +1201,14 @@ class TestFit:
             # replace it with the value of the frequency array f at that index
             # value. Need to change from tuple to list and back to modify
             # individual elements.
-            f_bounds = list(f_bounds)
+            f_list = list(f_bounds)
             for i in range(2):
-                f_bounds[i] = (
-                    f[f_bounds[i]]
-                    if isinstance(f_bounds[i], int)
-                    else f_bounds[i]
+                f_list[i] = (
+                    f[f_list[i]]
+                    if isinstance(f_list[i], int)
+                    else f_list[i]
                 )
-            f_bounds = tuple(f_bounds)
+            f_bounds = tuple(f_list)
 
         p = fit(
             tfun,
