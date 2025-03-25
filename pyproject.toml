@@ -61,6 +61,7 @@ dependencies = [
     "matplotlib",
     "numdifftools",
     "numpy",
+    "pre-commit",
     "pytest",
     "pytest-cov",
     "scipy",

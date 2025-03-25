@@ -105,7 +105,7 @@ for maintaining this file.
 - Set tolerance parameter in `minimize` function used in `noisefit`
 - Change `fft_sign` options to `numpy_sign_convention`
 - Restore factor of `0.5` in cost function computation and gradient
-- Replace `scale_sigma_*` parameters (which simply adds a constant to the log) 
+- Replace `scale_sigma_*` parameters (which simply adds a constant to the log)
   with `scale_logv_*` parameters
 - Refactor `noisefit` to encapsulate cost function computations in separate
   functions, `_nll_noisefit`, `_jac_noisefit`, and `_hess_noisefit`

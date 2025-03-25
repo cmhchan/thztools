@@ -64,7 +64,7 @@ previously [@mohtashemi2021].
 In the conventional approach to THz-TDS analysis [@neu2018a], one transforms
 the time-domain measurements into the frequency domain for further analysis.
 This approach has well-known problems, however, which can be resolved by
-using a maximum-likelihood estimation procedure in the time 
+using a maximum-likelihood estimation procedure in the time
 domain [@mohtashemi2021]. To support this mode of analysis, the `THzTools`
 package provides functionality and documentation that are unavailable in
 existing THz-TDS analysis software [@peretti2019; @tayvah2021; @lee2023]. It

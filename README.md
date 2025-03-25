@@ -45,12 +45,12 @@ See the [Getting started](https://dodge-research-group.github.io/thztools/gettin
 In the conventional approach to THz-TDS analysis, one transforms
 the time-domain measurements into the frequency domain for further analysis.
 This approach has well-known problems, however, which can be resolved by
-using a maximum-likelihood estimation procedure in the time 
+using a maximum-likelihood estimation procedure in the time
 domain. To support this mode of analysis, the `THzTools`
 package provides functionality and documentation that are unavailable in
 existing THz-TDS analysis software. It provides functions to simulate THz-TDS
 measurements (eg, [`timebase`](https://dodge-research-group.github.io/thztools/generated/thztools.timebase.html)
-and [`wave`](https://dodge-research-group.github.io/thztools/generated/thztools.wave.html)), 
+and [`wave`](https://dodge-research-group.github.io/thztools/generated/thztools.wave.html)),
 apply a frequency response function to a THz-TDS waveform ([`apply_frf`](https://dodge-research-group.github.io/thztools/generated/thztools.apply_frf.html)),
 characterize the noise of a THz-TDS system ([`noisefit`](https://dodge-research-group.github.io/thztools/generated/thztools.noisefit.html)),
 and fit a parameterized frequency response function to a pair of input and
@@ -116,13 +116,13 @@ Software (**JOSS**) paper that describes the software.
 ### Optics Express
 ```
 @article{Mohtashemi2021,
-author = {Laleh Mohtashemi and Paul Westlund and Derek G. Sahota and 
+author = {Laleh Mohtashemi and Paul Westlund and Derek G. Sahota and
 Graham B. Lea and Ian Bushfield and Payam Mousavi and J. Steven Dodge},
 journal = {Opt. Express},
 number = {4},
 pages = {4912--4926},
 publisher = {Optica Publishing Group},
-title = {Maximum-likelihood parameter estimation in terahertz time-domain 
+title = {Maximum-likelihood parameter estimation in terahertz time-domain
 spectroscopy},
 volume = {29},
 month = {Feb},
