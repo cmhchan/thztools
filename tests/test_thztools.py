@@ -129,7 +129,7 @@ class TestNoiseModel:
         else:
             noise_model = NoiseModel(alpha, beta, tau, dt=dt)
             result = noise_model.noise_var(mu, axis=axis)
-        assert_allclose(result, expected, atol=eps, rtol=rtol)  # type: ignore
+        assert_allclose(result, expected, atol=eps, rtol=rtol)
 
     @pytest.mark.parametrize(
         "alpha, beta, tau, mu, dt, axis, expected",
@@ -158,7 +158,7 @@ class TestNoiseModel:
         else:
             noise_model = NoiseModel(alpha, beta, tau, dt=dt)
             result = noise_model.noise_amp(mu, axis=axis)
-        assert_allclose(result, expected, atol=eps, rtol=rtol)  # type: ignore
+        assert_allclose(result, expected, atol=eps, rtol=rtol)
 
     @pytest.mark.parametrize(
         "alpha, beta, tau, mu, dt, axis, expected",
@@ -276,8 +276,8 @@ class TestWave:
             ]
         )
         assert_allclose(
-            wave(n, dt=dt, t0=t0, **kwargs),  # type: ignore
-            y_expected,  # type: ignore
+            wave(n, dt=dt, t0=t0, **kwargs),
+            y_expected,
             atol=eps,
             rtol=rtol,
         )
@@ -344,8 +344,8 @@ class TestScaleShift:
         expected: NDArray[np.float64],
     ) -> None:
         assert_allclose(
-            scaleshift(x, **kwargs),  # type: ignore
-            expected,  # type: ignore
+            scaleshift(x, **kwargs),
+            expected,
             atol=eps,
             rtol=rtol,
         )
