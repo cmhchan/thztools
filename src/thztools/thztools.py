@@ -51,7 +51,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Concatenate
 
 import numpy as np
 import scipy.linalg as la
@@ -65,6 +65,7 @@ from scipy.optimize import OptimizeResult, approx_fprime, minimize
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
+
 
 NUM_NOISE_PARAMETERS = 3
 NUM_NOISE_DATA_DIMENSIONS = 2
@@ -2904,7 +2905,9 @@ def _costfuntls(
 
 
 def fit(
-    frfun: Callable,
+    frfun: Callable[
+        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
+    ],
     xdata: ArrayLike,
     ydata: ArrayLike,
     p0: ArrayLike,
@@ -2912,12 +2915,15 @@ def fit(
     *,
     dt: float | None = None,
     numpy_sign_convention: bool = True,
-    args: tuple = (),
-    kwargs: dict | None = None,
+    args: tuple[float, ...] = (),
+    kwargs: dict[str, Any] | None = None,
     f_bounds: ArrayLike | None = None,
     p_bounds: ArrayLike | None = None,
-    jac: Callable | None = None,
-    lsq_options: dict | None = None,
+    jac: Callable[
+        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
+    ]
+    | None = None,
+    lsq_options: dict[str, Any] | None = None,
 ) -> FitResult:
     r"""
     Fit a parameterized frequency response function to time-domain data.

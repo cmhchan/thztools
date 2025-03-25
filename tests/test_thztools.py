@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Concatenate
 
 import numpy as np
 import pytest
@@ -34,15 +34,18 @@ n_default = 16
 
 
 def tfun(
-    w: NDArray[np.float64], p0: float, p1: float
+    w: NDArray[np.float64], /, p0: float, p1: float
 ) -> NDArray[np.complex128]:
-    return p0 * np.exp(1j * p1 * w)
+    return np.astype(p0 * np.exp(1j * p1 * w), np.complex128)
 
 
 def jac_tfun(
-    w: NDArray[np.float64], p0: float, p1: float
+    w: NDArray[np.float64], /, p0: float, p1: float
 ) -> NDArray[np.complex128]:
-    return np.stack((np.exp(1j * p1 * w), 1j * w * p0 * np.exp(1j * p1 * w))).T
+    return np.stack(
+        (np.exp(1j * p1 * w), 1j * w * p0 * np.exp(1j * p1 * w)),
+        dtype=np.complex128,
+    ).T
 
 
 def data_gen(n: int = n_default, *, np_sign: bool = True) -> dict[str, Any]:
@@ -1182,7 +1185,7 @@ class TestFit:
         f_bounds: tuple | None,
         p_bounds: ArrayLike | None,
         jac: Callable[
-            [NDArray[np.float64], float, float], NDArray[np.complex128]
+            Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
         ],
         lsq_options: dict[str, Any],
     ) -> None:
@@ -1229,7 +1232,7 @@ class TestFit:
         *,
         numpy_sign_convention: bool,
         jac: Callable[
-            [NDArray[np.float64], float, float], NDArray[np.complex128]
+            Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
         ]
         | None,
     ) -> None:
@@ -1259,8 +1262,9 @@ class TestFit:
         *,
         numpy_sign_convention: bool,
         jac: Callable[
-            [NDArray[np.float64], float, float], NDArray[np.complex128]
-        ],
+            Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
+        ]
+        | None,
     ) -> None:
         sigma = self.sigma
         d = data_gen(np_sign=numpy_sign_convention)
