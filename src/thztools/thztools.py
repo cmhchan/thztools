@@ -64,7 +64,6 @@ from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
 
-print(sys.version_info)
 if sys.version_info >= (3, 10):
     from typing import Concatenate
 elif sys.version_info[:2] == (3, 9):
