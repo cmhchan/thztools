@@ -42,3 +42,5 @@ repos:
     hooks:
       - id: prettier
         types_or: [yaml, markdown, html, css, scss, javascript, json]
+ci:
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
