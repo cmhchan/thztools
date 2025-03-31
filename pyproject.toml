@@ -137,7 +137,9 @@ dependencies = [
     "sphinx-tabs",
     "tomli",
 ]
+
 xfail_strict = true
+
 [tool.hatch.envs.docs.scripts]
 build = "sphinx-build -v -b html docs/source docs/build/html"
 
