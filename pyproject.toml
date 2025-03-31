@@ -127,6 +127,9 @@ exclude_lines = [
 [tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib",
+    "--strict-config",
+    "--strict-markers",
+    "-ra"
 ]
 testpaths = ["tests"]
 minversion = "7"
