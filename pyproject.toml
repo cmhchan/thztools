@@ -131,6 +131,7 @@ addopts = [
     "--strict-markers",
     "-ra"
 ]
+xfail_strict = true
 testpaths = ["tests"]
 minversion = "7"
 
@@ -148,6 +149,7 @@ dependencies = [
     "sphinx-tabs",
     "tomli",
 ]
+
 [tool.hatch.envs.docs.scripts]
 build = "sphinx-build -v -b html docs/source docs/build/html"
 
