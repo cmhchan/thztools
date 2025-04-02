@@ -171,14 +171,12 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.hatch.envs.lint]
-detached = true
-dependencies = [
-    "mypy>=1.0.0",
-    "numpy",
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
 ]
-[tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/thztools tests}"
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/thztools tests}"
 
 [tool.hatch.build.targets.sdist]
 exclude = [

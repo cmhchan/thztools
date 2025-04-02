@@ -52,7 +52,7 @@ from __future__ import annotations
 import sys
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import scipy.linalg as la
@@ -73,8 +73,9 @@ else:
     raise ValueError(msg)
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    from collections.abc import Callable
 
+    from numpy.typing import ArrayLike, NDArray
 
 NUM_NOISE_PARAMETERS = 3
 NUM_NOISE_DATA_DIMENSIONS = 2
@@ -674,9 +675,7 @@ class NoiseResult:
 
 # noinspection PyShadowingNames
 def apply_frf(
-    frfun: Callable[
-        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
-    ],
+    frfun: Callable[..., NDArray[np.complex128]],
     x: ArrayLike,
     *,
     dt: float | None = None,
@@ -2854,9 +2853,7 @@ class FitResult:
 
 
 def _costfuntls(
-    frfun: Callable[
-        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
-    ],
+    frfun: Callable[..., NDArray[np.complex128]],
     theta: ArrayLike,
     mu: ArrayLike,
     x: ArrayLike,
@@ -2927,9 +2924,7 @@ def _costfuntls(
 
 
 def fit(
-    frfun: Callable[
-        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
-    ],
+    frfun: Callable[..., NDArray[np.complex128]],
     xdata: ArrayLike,
     ydata: ArrayLike,
     p0: ArrayLike,
@@ -3155,7 +3150,6 @@ def fit(
     """
     fit_method = "trf"
 
-    args = np.atleast_1d(np.asarray(args))
     if kwargs is None:
         kwargs = {}
 
@@ -3215,8 +3209,10 @@ def fit(
         elif n % 2 == 1 and n_below == 0:
             n_b += 1
 
-    alpha, beta, tau = noise_parms.tolist()
-    # noinspection PyArgumentList
+    # alpha, beta, tau = noise_parms.tolist()
+    alpha = noise_parms[0]
+    beta = noise_parms[1]
+    tau = noise_parms[2]
     noise_model = NoiseModel(alpha, beta, tau, dt=dt)
     sigma_x = noise_model.noise_amp(xdata)
     sigma_y = noise_model.noise_amp(ydata)
