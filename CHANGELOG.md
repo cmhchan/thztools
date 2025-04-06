@@ -8,21 +8,25 @@ for maintaining this file.
 ## [0.5.5.post0] - 2024-12-02
 
 ### Added
+
 - Add pyOpenSci badge to `README.md`
 - Add JOSS badge to `README.md`
 
 ### Changed
+
 - Update `CITATION.cff`
 - Change citation information in `README.md`
 
 ## [0.5.5] - 2024-11-19
 
 ### Added
+
 - Add list of related software to README
 
 ## [0.5.4] - 2024-10-19
 
 ### Added
+
 - Add CITATION.cff file
 - Add citation information to README
 - Add links to README that point to online documentation examples
@@ -31,16 +35,19 @@ for maintaining this file.
 - Add support for Python 3.13
 
 ### Removed
+
 - Remove support for Python 3.8
 
 ## [0.5.3] - 2024-10-12
 
 ### Fixed
+
 - Fix documentation error in the Contributing section
   ([#59](https://github.com/dodge-research-group/thztools/issues/59))
 - Fix typographical errors in JOSS paper
 
 ### Added
+
 - Add [repostatus.org](https://www.repostatus.org/) badge
   ([#58](https://github.com/dodge-research-group/thztools/issues/58))
 - Add documentation on type checking in the Contributing section
@@ -50,23 +57,28 @@ for maintaining this file.
 ## [0.5.2] - 2024-09-11
 
 ### Changed
+
 - Replace Black badge with Ruff badge in `README.md`
 
 ### Fixed
+
 - Fix documentation error in `fit`
 
 ## [0.5.1] - 2024-08-15
 
 ### Added
+
 - Add `CONTRIBUTING.md` file
-- Add *Installation* section to `README.md`
+- Add _Installation_ section to `README.md`
 
 ### Fixed
+
 - Fix error in `bug_report` issue template
 
 ## [0.5.0] - 2024-08-01
 
 ### Changed
+
 - Change development status to beta
 - Change `mu_var` attribute of `FitResult` to `mu_err`
 - Change `p_var` attribute of `FitResult` to `p_cov`
@@ -79,8 +91,9 @@ for maintaining this file.
 - Reorganize tests
 
 ### Added
+
 - Add configuration file for doctests with PyTest
-- Add example of appling a frequency response function
+- Add example of applying a frequency response function
 - Add example of estimating noise model parameters
 - Add example of fitting a parameterized frequency response function model
 - Add example of rescaling and shifting a waveform
@@ -90,10 +103,12 @@ for maintaining this file.
 - Add tests for new functionality
 
 ### Removed
+
 - Remove `examples` directory from top level
 - Remove unused lint options from `pyproject.toml`
 
 ### Fixed
+
 - Correct total least-squares residual computation
 
 ## [0.4.2] - 2024-06-30
@@ -105,7 +120,7 @@ for maintaining this file.
 - Set tolerance parameter in `minimize` function used in `noisefit`
 - Change `fft_sign` options to `numpy_sign_convention`
 - Restore factor of `0.5` in cost function computation and gradient
-- Replace `scale_sigma_*` parameters (which simply adds a constant to the log) 
+- Replace `scale_sigma_*` parameters (which simply adds a constant to the log)
   with `scale_logv_*` parameters
 - Refactor `noisefit` to encapsulate cost function computations in separate
   functions, `_nll_noisefit`, `_jac_noisefit`, and `_hess_noisefit`
@@ -166,7 +181,7 @@ for maintaining this file.
   `noise_amp`, `noise_sim`, and `noise_var`, respectively
 - Revise `noisefit` and associated functions to treat each of the 3 noise
   parameters separately instead of as a 3-component array, so that each may
-  fixed independently in the optimization process
+  be fixed independently in the optimization process
 - Adjust internal scaling in `noisefit`
 - Reorganize `NoiseResult` class as output for `noisefit`
 - Revise `NoiseResult` docstring
@@ -180,7 +195,7 @@ for maintaining this file.
 - Improve type annotations
 - Update tests
 - Update dependencies in `environment-dev.yml` and `pyproject.toml`
-- Revise *Getting Started* page
+- Revise _Getting Started_ page
 - Revise documentation, including Sphinx format and project-specific layout
 
 ### Added

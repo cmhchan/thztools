@@ -61,6 +61,7 @@ dependencies = [
     "matplotlib",
     "numdifftools",
     "numpy",
+    "pre-commit",
     "pytest",
     "pytest-cov",
     "scipy",
@@ -86,10 +87,15 @@ make-logo = ["python logo/make_logo.py; mv thztools_logo.svg docs/source/_static
 python = ["3.9", "3.10", "3.11", "3.12", "3.13", ]
 
 [tool.ruff]
-target-version = "py39"
 line-length = 79
 exclude = ["examples/figgen/**"]
 
+[tool.ruff.lint]
+extend-select = [
+    "B",  # flake8-bugbear
+    "I",  # isort
+    "UP",  # pyupgrade
+]
 [tool.ruff.lint.per-file-ignores]
 "docs/source/**" = ["INP001"]
 "tests/**" = ["INP001"]
@@ -121,8 +127,14 @@ exclude_lines = [
 [tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib",
+    "--strict-config",
+    "--strict-markers",
+    "-ra"
 ]
 log_cli_level = "INFO"
+xfail_strict = true
+testpaths = ["tests"]
+minversion = "7"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -138,11 +150,20 @@ dependencies = [
     "sphinx-tabs",
     "tomli",
 ]
+
 [tool.hatch.envs.docs.scripts]
 build = "sphinx-build -v -b html docs/source docs/build/html"
 
+[tool.hatch.envs.all]
+dependencies = [
+    "typing-extensions",
+]
+
 [tool.mypy]
 plugins = "numpy.typing.mypy_plugin"
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
 module = [
@@ -153,14 +174,12 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.hatch.envs.lint]
-detached = true
-dependencies = [
-    "mypy>=1.0.0",
-    "numpy",
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
 ]
-[tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/thztools tests}"
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/thztools tests}"
 
 [tool.hatch.build.targets.sdist]
 exclude = [

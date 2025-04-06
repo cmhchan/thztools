@@ -16,27 +16,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
 
-    - name: Install hatch
-      run: pip install hatch
-    - name: Build a binary wheel and a source tarball
-      run: hatch build
+      - name: Install hatch
+        run: pip install hatch
+      - name: Build a binary wheel and a source tarball
+        run: hatch build
 
-    - name: Publish distribution 📦 to Test PyPI
-      if: github.event_name == 'push'
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.TEST_PYPI }}
-        repository-url: https://test.pypi.org/legacy/
-        skip_existing: true
+      - name: Publish distribution 📦 to Test PyPI
+        if: github.event_name == 'push'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.TEST_PYPI }}
+          repository-url: https://test.pypi.org/legacy/
+          skip_existing: true
 
-    - name: Publish distribution 📦 to PyPI
-      if: github.event_name == 'release'
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.PYPI }}
+      - name: Publish distribution 📦 to PyPI
+        if: github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI }}
