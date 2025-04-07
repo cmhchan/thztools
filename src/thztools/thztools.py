@@ -63,7 +63,6 @@ from numpy.random import default_rng
 from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
-import scipy.fft as spfft
 from scipy.signal.windows import *
 from scipy.signal.windows import __all__ as windowlist
 
@@ -1007,10 +1006,6 @@ def fft(
         Scipy window transform for x. If window is None, a default 'tukey' window
         function is applied.
 
-    Returns 
-    -------
-    x_fft : ndarray
-        Transformed array.
     
     Raises
     -----
@@ -1034,16 +1029,14 @@ def fft(
 
     if window is None:
         windx = signal.windows.tukey(len(x)) * x
-        x_fft = np.fft.rfft(windx, n)
-        return x_fft
+        return np.fft.rfft(windx, n)
     elif window not in windowlist:
          msg = f"Window parameter only accepts functions in {windowlist}"
          raise ValueError(msg)
     else:
         windx = x * signal.windows.get_window(window, len(x))
-        x_fft = np.fft.rfft(windx, n)
-        return x_fft
-    
+        return np.fft.rfft(windx, n)
+
 
 
 # noinspection PyShadowingNames
