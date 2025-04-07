@@ -131,6 +131,7 @@ addopts = [
     "--strict-markers",
     "-ra"
 ]
+log_cli_level = "INFO"
 xfail_strict = true
 testpaths = ["tests"]
 minversion = "7"
