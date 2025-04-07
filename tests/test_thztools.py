@@ -26,6 +26,7 @@ from thztools.thztools import (
     scaleshift,
     set_option,
     wave,
+    fft,
 )
 
 eps = np.sqrt(np.finfo(np.float64).eps)
@@ -273,6 +274,24 @@ class TestWave:
             atol=eps,
             rtol=rtol,
         )
+
+class TestFFT:
+    
+    @pytest.mark.parametrize(
+        "n",
+        [
+            0,
+            -9,
+        ]
+    )   
+
+    def testfft_errors(self, n):
+        with pytest.raises(ValueError):
+            t = np.linspace(-10,10,1000)
+            yarray = np.sin(0.7*t) + 0.5*np.sin(t)
+            fft(yarray, n=n, window=None)
+    
+
 
 
 
