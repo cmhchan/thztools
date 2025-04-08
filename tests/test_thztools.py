@@ -19,6 +19,7 @@ from thztools.thztools import (
     _jac_noisefit,
     _parse_noisefit_input,
     apply_frf,
+    fft,
     fit,
     get_option,
     noisefit,
@@ -26,7 +27,6 @@ from thztools.thztools import (
     scaleshift,
     set_option,
     wave,
-    fft,
 )
 
 eps = np.sqrt(np.finfo(np.float64).eps)
@@ -284,9 +284,10 @@ class TestFFT:
             -9,
         ]
     )
-
     def testfft_errors(self, n):
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match=r'.*Invalid.*FFT.*data.*points.*'
+            ):
             t = np.linspace(-10,10,1000)
             yarray = np.sin(0.7*t) + 0.5*np.sin(t)
             fft(yarray, n=n, window=None)
@@ -297,9 +298,10 @@ class TestFFT:
             "azure"
         ]
     )
-
     def testfft_window(self, window):
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match=r'.*Window.*parameter.*only.*accepts.*functions.*in.*'
+        ):
             t = np.linspace(-10,10,1000)
             yarray = np.sin(0.7*t) + 0.5*np.sin(t)
             fft(yarray, n=None, window=window)

@@ -63,7 +63,8 @@ from numpy.random import default_rng
 from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
-from scipy.signal.windows import *
+
+#from scipy.signal.windows import *
 from scipy.signal.windows import __all__ as windowlist
 
 if TYPE_CHECKING:
@@ -999,14 +1000,18 @@ def fft(
     x : array-like
         Data array.
     n : int or None
-        Transformation axis length. If 'n' is more than the input, the array is 
+        Transformation axis length. If 'n' is more than the input, the array is
         zero padded to 'n'. If 'n' . If 'n' is less than the input, the array is
         spliced. If not given, the 'x' array length is used.
     window : str or None
         Scipy window transform for x. If window is None, a default 'tukey' window
         function is applied.
 
-    
+    Returns
+    -----
+    x_fft: ndarray
+        Transformed array.
+
     Raises
     -----
     ValueError
@@ -1022,20 +1027,19 @@ def fft(
     -----
 
     """
-    if n is None:
-        n == len(x)
-    else:
-        n == 2*(n-1)
+    n = len(x) if n is None else 2 * (n - 1)
 
     if window is None:
         windx = signal.windows.tukey(len(x)) * x
-        return np.fft.rfft(windx, n)
+        x_fft = np.fft.rfft(windx, n)
     elif window not in windowlist:
          msg = f"Window parameter only accepts functions in {windowlist}"
          raise ValueError(msg)
     else:
         windx = x * signal.windows.get_window(window, len(x))
-        return np.fft.rfft(windx, n)
+        x_fft = np.fft.rfft(windx, n)
+
+    return x_fft
 
 
 
