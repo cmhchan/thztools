@@ -1026,7 +1026,7 @@ def fft(
     -----
 
     """
-    n == len(x) if n is None else 2 * (n - 1) == n
+    n = len(x) if n is None else 2 * (n - 1)
 
     if window is None:
         windx = signal.windows.tukey(len(x)) * x

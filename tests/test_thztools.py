@@ -301,6 +301,16 @@ class TestFFT:
             match=r".*Window.*parameter.*only.*accepts.*functions.*in.*",
         ):
             fft(yarray, n=None, window=window)
+    @pytest.mark.parametrize(
+        "n, expected",
+        [
+            (None, ),
+            150,
+            50,
+        ],
+    )
+    def testfft(self, x: ArrayLike, n: int|None, window: str|None) -> None:
+
 
 
 class TestScaleShift:
