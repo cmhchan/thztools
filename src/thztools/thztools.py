@@ -64,7 +64,7 @@ from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
 
-#from scipy.signal.windows import *
+# from scipy.signal.windows import *
 from scipy.signal.windows import __all__ as windowlist
 
 if TYPE_CHECKING:
@@ -984,12 +984,11 @@ def wave(
     return a * x_unscaled / np.max(x_unscaled)
 
 
-
 def fft(
     x: ArrayLike,
     *,
-    n: int| None = None,
-    window: str| None = None,
+    n: int | None = None,
+    window: str | None = None,
 ) -> NDArray[np.float64]:
     r"""
     Apply a fourier transform and default tukey window.
@@ -1033,14 +1032,13 @@ def fft(
         windx = signal.windows.tukey(len(x)) * x
         x_fft = np.fft.rfft(windx, n)
     elif window not in windowlist:
-         msg = f"Window parameter only accepts functions in {windowlist}"
-         raise ValueError(msg)
+        msg = f"Window parameter only accepts functions in {windowlist}"
+        raise ValueError(msg)
     else:
         windx = x * signal.windows.get_window(window, len(x))
         x_fft = np.fft.rfft(windx, n)
 
     return x_fft
-
 
 
 # noinspection PyShadowingNames
