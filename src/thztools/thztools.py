@@ -50,9 +50,10 @@ Create an ideal waveform and apply a frequency response function to it.
 
 from __future__ import annotations
 
+import sys
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import scipy.linalg as la
@@ -64,10 +65,18 @@ from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
 
-# from scipy.signal.windows import *
 from scipy.signal.windows import __all__ as windowlist
+if sys.version_info >= (3, 10):
+    from typing import Concatenate
+elif sys.version_info[:2] == (3, 9):
+    from typing_extensions import Concatenate
+else:
+    msg = "Concatenate type annotation unavailable for Python 3.8 and earlier."
+    raise ValueError(msg)
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from numpy.typing import ArrayLike, NDArray
 
 NUM_NOISE_PARAMETERS = 3
@@ -668,7 +677,7 @@ class NoiseResult:
 
 # noinspection PyShadowingNames
 def apply_frf(
-    frfun: Callable,
+    frfun: Callable[..., NDArray[np.complex128]],
     x: ArrayLike,
     *,
     dt: float | None = None,
@@ -1155,7 +1164,7 @@ def scaleshift(
     if x.ndim > 1 and axis != -1:
         x_adjusted = np.moveaxis(x_adjusted, -1, axis)
 
-    return x_adjusted
+    return np.astype(x_adjusted, np.float64)
 
 
 @dataclass
@@ -1265,7 +1274,7 @@ def _nll_noisefit(
     scale_delta_mu: NDArray[np.float64],
     scale_delta_a: NDArray[np.float64],
     scale_eta_on_dt: NDArray[np.float64],
-) -> tuple[float, NDArray[np.float64]]:
+) -> np.float64:
     r"""
     Compute the cost function for the time-domain noise model.
 
@@ -1326,7 +1335,7 @@ def _nll_noisefit(
     vtot = common.vtot
     resnormsq_scaled = ressq / vtot
 
-    return 0.5 * (np.sum(np.log(vtot)) + np.sum(resnormsq_scaled))
+    return np.float64(0.5 * (np.sum(np.log(vtot)) + np.sum(resnormsq_scaled)))
 
 
 def _jac_noisefit(
@@ -2031,7 +2040,7 @@ def _hess_noisefit(
     scale = np.concatenate(scale_block[~fix].tolist())
 
     # Return Hessian in scaled internal variables
-    return np.diag(scale) @ h @ np.diag(scale)
+    return np.astype(np.diag(scale) @ h @ np.diag(scale), np.float64)
 
 
 def noisefit(
@@ -2056,7 +2065,7 @@ def noisefit(
     scale_delta_mu: ArrayLike | None = None,
     scale_delta_a: ArrayLike | None = None,
     scale_eta: ArrayLike | None = None,
-    min_options: dict | None = None,
+    min_options: dict[str, Any] | None = None,
 ) -> NoiseResult:
     r"""
     Estimate noise model from a set of nominally identical waveforms.
@@ -2307,7 +2316,12 @@ def _parse_noisefit_input(
     scale_delta_mu: ArrayLike | None,
     scale_delta_a: ArrayLike | None,
     scale_eta: ArrayLike | None,
-) -> tuple[Callable, Callable, NDArray[np.float64], dict]:
+) -> tuple[
+    Callable[[NDArray[np.float64]], np.float64],
+    Callable[[NDArray[np.float64]], NDArray[np.float64]],
+    NDArray[np.float64],
+    dict[str, Any],
+]:
     """Parse noisefit inputs"""
     if x.ndim != NUM_NOISE_DATA_DIMENSIONS:
         msg = "Data array x must be 2D"
@@ -2371,6 +2385,8 @@ def _parse_noisefit_input(
         scale_delta_mu[np.isclose(scale_delta_mu, 0.0)] = np.sqrt(
             np.finfo(float).eps
         )
+
+    scale_delta_mu = np.asarray(scale_delta_mu, dtype=np.float64)
 
     if scale_delta_a is None:
         scale_delta_a_amp = np.max((sigma_min, sigma_beta0))
@@ -2443,7 +2459,9 @@ def _parse_noisefit_input(
         x0 = np.concatenate((x0, eta_scaled0))
 
     # Bundle free parameters together into objective function
-    def objective(_p):
+    def objective(
+        _p: NDArray[np.float64],
+    ) -> np.float64:
         if fix_sigma_alpha:
             _logv_alpha = logv0_scaled[0]
         else:
@@ -2489,7 +2507,7 @@ def _parse_noisefit_input(
         )
 
     # Bundle free parameters together into objective function
-    def jac(_p):
+    def jac(_p: NDArray[np.float64]) -> NDArray[np.float64]:
         if fix_sigma_alpha:
             _logv_alpha = logv0_scaled[0]
         else:
@@ -2540,7 +2558,7 @@ def _parse_noisefit_input(
             scale_eta_on_dt=scale_eta / dt,  # Scale in units of dt
         )
 
-    def hess(_p):
+    def hess(_p: NDArray[np.float64]) -> NDArray[np.float64]:
         if fix_sigma_alpha:
             _logv_alpha = logv0_scaled[0]
         else:
@@ -2894,7 +2912,7 @@ class FitResult:
 
 
 def _costfuntls(
-    frfun: Callable,
+    frfun: Callable[..., NDArray[np.complex128]],
     theta: ArrayLike,
     mu: ArrayLike,
     x: ArrayLike,
@@ -2965,7 +2983,7 @@ def _costfuntls(
 
 
 def fit(
-    frfun: Callable,
+    frfun: Callable[..., NDArray[np.complex128]],
     xdata: ArrayLike,
     ydata: ArrayLike,
     p0: ArrayLike,
@@ -2973,12 +2991,15 @@ def fit(
     *,
     dt: float | None = None,
     numpy_sign_convention: bool = True,
-    args: tuple = (),
-    kwargs: dict | None = None,
+    args: tuple[float, ...] = (),
+    kwargs: dict[str, Any] | None = None,
     f_bounds: ArrayLike | None = None,
     p_bounds: ArrayLike | None = None,
-    jac: Callable | None = None,
-    lsq_options: dict | None = None,
+    jac: Callable[
+        Concatenate[NDArray[np.float64], ...], NDArray[np.complex128]
+    ]
+    | None = None,
+    lsq_options: dict[str, Any] | None = None,
 ) -> FitResult:
     r"""
     Fit a parameterized frequency response function to time-domain data.
@@ -2991,7 +3012,7 @@ def fit(
     ----------
     frfun : callable
         Frequency response function with signature ``frfun(omega, *p, *args,
-        **kwargs)`` that returns an ``ndarray``. Assumes the
+        **kwargs)`` that returns a complex ``ndarray``. Assumes the
         :math:`+i\omega t` convention for harmonic time dependence when
         ``numpy_sign_convention`` is ``True``, the default. All elements of
         ``p`` and ``args`` and all values of ``kwargs`` must be real
@@ -3188,7 +3209,6 @@ def fit(
     """
     fit_method = "trf"
 
-    args = np.atleast_1d(args)
     if kwargs is None:
         kwargs = {}
 
@@ -3248,8 +3268,10 @@ def fit(
         elif n % 2 == 1 and n_below == 0:
             n_b += 1
 
-    alpha, beta, tau = noise_parms.tolist()
-    # noinspection PyArgumentList
+    # alpha, beta, tau = noise_parms.tolist()
+    alpha = noise_parms[0]
+    beta = noise_parms[1]
+    tau = noise_parms[2]
     noise_model = NoiseModel(alpha, beta, tau, dt=dt)
     sigma_x = noise_model.noise_amp(xdata)
     sigma_y = noise_model.noise_amp(ydata)
@@ -3313,7 +3335,7 @@ def fit(
         return _a + _b * 1j
 
     def function(
-        _w: NDArray[np.float64], *_theta: np.float64
+        _w: NDArray[np.float64], /, *_theta: np.float64
     ) -> NDArray[np.complex128]:
         _a = np.asarray(_theta[n_p : n_p + n_a], dtype=np.float64)
         _b = np.asarray(_theta[n_p + n_a :], dtype=np.float64)
@@ -3330,12 +3352,15 @@ def fit(
             # If Jacobian is not supplied, compute it numerically
             _tf_prime = approx_fprime(_p, function_flat)
             _tf_prime_complex = _tf_prime[0:n_in] + 1j * _tf_prime[n_in:]
-            out = np.atleast_2d(_tf_prime_complex).T
+            out = np.astype(np.atleast_2d(_tf_prime_complex).T, np.complex128)
         else:
             # Otherwise, return supplied Jacobian
-            out = np.atleast_2d(jac(w[f_incl_idx], *_p, *args, **kwargs))[
-                :, :n_p
-            ].T
+            out = np.astype(
+                np.atleast_2d(jac(w[f_incl_idx], *_p, *args, **kwargs))[
+                    :, :n_p
+                ].T,
+                np.complex128,
+            )
         if not numpy_sign_convention:
             return np.conj(out)
         return out

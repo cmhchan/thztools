@@ -26,6 +26,8 @@ __all__ = [
     "GlobalOptions",
     "NoiseModel",
     "NoiseResult",
+    "__version__",
+    "apply_frf",
     "fit",
     "get_option",
     "noisefit",
@@ -34,7 +36,5 @@ __all__ = [
     "scaleshift",
     "set_option",
     "timebase",
-    "apply_frf",
     "wave",
-    "__version__",
 ]
