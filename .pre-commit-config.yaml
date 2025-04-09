@@ -38,7 +38,7 @@ repos:
             --show-error-code-links,
             --show-error-context,
           ]
-        additional_dependencies: [numpy, pytest, scipy]
+        additional_dependencies: [numpy, pytest]
         verbose: true
   - repo: https://github.com/codespell-project/codespell
     rev: "v2.4.1"
@@ -57,5 +57,4 @@ repos:
       - id: prettier
         types_or: [yaml, markdown, html, css, scss, javascript, json]
 ci:
-  skip: [mypy]
   autoupdate_commit_msg: "chore: update pre-commit hooks"
