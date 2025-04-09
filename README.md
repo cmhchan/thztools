@@ -75,16 +75,18 @@ import thztools as thz
 # Set the waveform parameters
 n = 256  # Number of samples
 dt = 0.05  # Sampling time [ps]
-a = 0.5 # Scale factor
-eta = 1.0 # Delay [ps]
+a = 0.5  # Scale factor
+eta = 1.0  # Delay [ps]
 
 # Simulate the waveform
 t = thz.timebase(n, dt=dt)
 mu = thz.wave(n, dt=dt)
 
+
 # Define a frequency response function
 def frfun(omega, _a, _eta):
     return _a * np.exp(-1j * omega * _eta)
+
 
 # Apply the frequency response function to the waveform
 psi = thz.apply_frf(frfun, mu, dt=dt, args=(a, eta))

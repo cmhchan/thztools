@@ -15,6 +15,7 @@ Functions:
     scaleshift: Rescale and shift waveforms.
     timebase: Timebase for time-domain waveforms.
     wave: Simulate a terahertz waveform.
+    fft: Apply a fourier transform and windowing function.
 
 Other Functions:
     get_option: Get global option.
@@ -63,6 +64,7 @@ from numpy.random import default_rng
 from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
+from scipy.signal.windows import __all__ as windowlist
 
 if sys.version_info >= (3, 10):
     from typing import Concatenate
@@ -989,6 +991,63 @@ def wave(
     x_unscaled = irfft(np.conj(s), n=n)
 
     return a * x_unscaled / np.max(x_unscaled)
+
+
+def fft(
+    x: ArrayLike,
+    *,
+    n: int | None = None,
+    window: str | None = None,
+) -> NDArray[np.float64]:
+    r"""
+    Apply a fourier transform and default tukey window.
+
+    Parameters
+    ----------
+
+    x : array-like
+        Data array.
+    n : int or None
+        Transformation axis length. If 'n' is more than the input, the array is
+        zero padded to 'n'. If 'n' . If 'n' is less than the input, the array is
+        spliced. If not given, the 'x' array length is used.
+    window : str or None
+        Scipy window transform for x. If window is None, a default 'tukey' window
+        function is applied.
+
+    Returns
+    -----
+    x_fft: ndarray
+        Transformed array.
+
+    Raises
+    -----
+    ValueError
+        If the ``window`` parameter is not a window function
+        in scipy.signal.windows
+
+    Notes
+    -----
+    This function applies fourier and scipy window transformations
+    to real inputs. The default window is 'tukey', a tapered cosine.
+
+    Examples
+    -----
+
+    """
+    n = len(x) if n is None else 2 * (n - 1)
+
+    if window is None:
+        windx = signal.windows.tukey(len(x)) * x
+        x_fft = np.fft.rfft(windx, n)
+    elif window not in windowlist:
+        msg = f"Window parameter only accepts functions in {windowlist}"
+        raise ValueError(msg)
+    else:
+        windx = x * signal.windows.get_window(window, len(x))
+        x_fft = np.fft.rfft(windx, n)
+
+    return x_fft
 
 
 # noinspection PyShadowingNames
