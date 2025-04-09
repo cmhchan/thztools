@@ -64,8 +64,8 @@ from numpy.random import default_rng
 from scipy import signal
 from scipy.linalg import sqrtm
 from scipy.optimize import OptimizeResult, approx_fprime, minimize
-
 from scipy.signal.windows import __all__ as windowlist
+
 if sys.version_info >= (3, 10):
     from typing import Concatenate
 elif sys.version_info[:2] == (3, 9):
