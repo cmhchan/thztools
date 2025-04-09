@@ -998,7 +998,7 @@ def fft(
     *,
     n: int | None = None,
     window: str | None = None,
-) -> NDArray[np.float64]:
+) -> NDArray[np.complex128]:
     r"""
     Apply a fourier transform and default tukey window.
 
@@ -1035,7 +1035,8 @@ def fft(
     -----
 
     """
-    n = len(x) if n is None else 2 * (n - 1)
+    x = np.asarray(x, dtype=float)
+    n = x.size if n is None else 2 * (n - 1)
 
     if window is None:
         windx = signal.windows.tukey(len(x)) * x

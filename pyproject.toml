@@ -171,6 +171,7 @@ module = [
     "scipy",
     "scipy.linalg",
     "scipy.optimize",
+    "scipy.signal.windows",
 ]
 ignore_missing_imports = true
 
